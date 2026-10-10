@@ -31,6 +31,9 @@ h1{font:500 19px/1.2 Fredoka,"Trebuchet MS",system-ui,sans-serif;margin:0}
 #seew{left:0;right:0;bottom:76px;display:none;text-align:center;pointer-events:none}
 #see{pointer-events:auto;font:700 17px Fredoka,"Trebuchet MS",system-ui,sans-serif;color:#1a1200;background:#ffcf4a;border:0;border-radius:14px;padding:11px 24px;box-shadow:0 4px 0 #b8861a,0 6px 18px rgba(0,0,0,.5)}
 #see:active{transform:translateY(3px);box-shadow:0 1px 0 #b8861a}
+#lg{top:8px;right:8px;z-index:30;display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--pan)}
+#lg button{background:none;border:0;color:var(--mut);font:700 12px Nunito,system-ui,sans-serif;padding:6px 10px}
+#lg button.on{background:#ffcf4a;color:#1a1200}
 #xb{position:absolute;top:8px;right:10px;background:none;border:0;color:var(--mut);font-size:24px;cursor:pointer;line-height:1}
 #tip{bottom:70px;left:8px;right:8px;text-align:center;color:var(--mut);font-size:13px;pointer-events:none}
 #bar{bottom:8px;left:8px;right:8px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
@@ -67,8 +70,9 @@ button{cursor:pointer}#bar button{min-width:38px;font-size:16px}
 @media(max-width:700px){#info{top:auto;bottom:112px;left:8px;right:8px;width:auto;max-height:38%}#tip{bottom:auto;top:92px}}
 </style></head><body><div id="app">
 <div class="ui" id="labels"></div>
-<div class="ui" id="top"><h1>Le système solaire</h1>
-<div id="sub"><span id="time"></span><span class="hint"> · glisse pour tourner dans tous les sens · molette / pincement : zoom · tailles et distances non à l’échelle</span></div>
+<div class="ui" id="lg"><button data-l="fr" aria-label="Français">FR</button><button data-l="en" aria-label="English">EN</button></div>
+<div class="ui" id="top"><h1 data-k="h1">Le système solaire</h1>
+<div id="sub"><span id="time"></span><span class="hint" data-k="hint"> · glisse pour tourner dans tous les sens · molette / pincement : zoom · tailles et distances non à l’échelle</span></div>
 <div id="chips"></div></div>
 <div class="ui" id="info"></div>
 <div class="ui" id="tip"></div>
@@ -80,14 +84,14 @@ button{cursor:pointer}#bar button{min-width:38px;font-size:16px}
 <label><input type="checkbox" id="co" checked>Orbites</label><label><input type="checkbox" id="cl" checked>Noms</label>
 <button id="rs" title="Vue d’ensemble" aria-label="Vue d’ensemble">⌂</button><button id="hm" title="Accueil" aria-label="Accueil">Accueil</button></div>
 <div id="home"><div class="hi">
-<div class="kick">Visite guidée</div>
-<h2>Fais le tour du <span class="hl">système solaire<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 7 Q 14 1 26 7 T 50 7 T 74 7 T 98 7 T 122 7 T 146 7 T 170 7 T 198 7" fill="none" stroke="#ffcf4a" stroke-width="3.5" stroke-linecap="round"/></svg></span></h2>
-<p>Ici, tout bouge pour de vrai : les planètes tournent autour du Soleil, chacune à son rythme. Tu peux les faire pivoter, t’approcher tout près et lire leur fiche.</p>
-<div class="facts"><div><b>1</b><span>étoile, le Soleil</span></div><div><b>8</b><span>planètes</span></div><div><b>1</b><span>Terre, notre maison</span></div></div>
-<div class="note">Le savais-tu ? En avion, il faudrait près de 20 ans pour aller de la Terre au Soleil !</div>
-<ol class="how"><li>Glisse le doigt pour tourner dans tous les sens</li><li>Pince (ou molette) pour zoomer</li><li>Touche une planète pour la découvrir</li></ol>
-<button id="go">Commencer la visite →</button>
-<span class="back">Tu pourras revenir ici avec le bouton « Accueil ».</span>
+<div class="kick" data-k="kick">Visite guidée</div>
+<h2 data-k="h2"></h2>
+<p data-k="lead"></p>
+<div class="facts"><div><b>1</b><span data-k="f1"></span></div><div><b>8</b><span data-k="f2"></span></div><div><b>1</b><span data-k="f3"></span></div></div>
+<div class="note" data-k="note"></div>
+<ol class="how"><li data-k="how1"></li><li data-k="how2"></li><li data-k="how3"></li></ol>
+<button id="go" data-k="go"></button>
+<span class="back" data-k="back"></span>
 </div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -106,7 +110,24 @@ const S=[
 {id:'nep',n:'Neptune',ty:'Géante de glaces',c1:'#8aa9ff',c2:'#2641b8',r:8,a:505,p:60190,d:'49 244 km',di:'4 495 M km (30 UA)',y:'164,8 ans',j:'16 h 06 min',T:'≈ −200 °C',m:'16',f:'Neptune a été découverte par le calcul (Le Verrier, 1846) avant d’être observée. Ses vents dépassent 2 000 km/h.',e:'Sa lune Triton tourne en sens inverse de la rotation de Neptune, signe qu’elle a sans doute été capturée. Neptune n’a accompli qu’un seul tour du Soleil depuis sa découverte en 1846.'}];
 const PH=[0,1.2,2.5,4.0,0,.7,5.1,3.3,5.8,1.9],T3={ter:.41,mar:.44,jup:.05,sat:.47,ura:1.71,nep:.49,ven:3.09},ROT={sun:.05,mer:.05,ven:-.08,ter:.6,mar:.55,jup:1.3,sat:1.1,ura:-.8,nep:.9,lun:.1},K={sun:'sun',ter:'earth',ven:'gas',jup:'gas',sat:'gas',ura:'gas',nep:'gas'};
 S.forEach((b,i)=>b.ph=PH[i]);S.forEach(b=>{if(b.par)b.par=S.find(o=>o.id==b.par)});
-const TIPS=['1 UA (unité astronomique) = 149,6 millions de km, la distance Terre–Soleil.','Si le Soleil était un ballon de basket, la Terre serait un grain de poivre à 26 mètres.','Les 4 planètes proches sont rocheuses ; les 4 lointaines sont des géantes de gaz ou de glaces.','Plus une planète est proche du Soleil, plus elle va vite : Mercure ≈ 47 km/s, Neptune ≈ 5,4 km/s.','En réalité, les orbites sont des ellipses (1ʳᵉ loi de Kepler) ; ici elles sont simplifiées en cercles.','La lumière du Soleil met plus de 4 heures pour atteindre Neptune.'];
+const TIPS={fr:['1 UA (unité astronomique) = 149,6 millions de km, la distance Terre–Soleil.','Si le Soleil était un ballon de basket, la Terre serait un grain de poivre à 26 mètres.','Les 4 planètes proches sont rocheuses ; les 4 lointaines sont des géantes de gaz ou de glaces.','Plus une planète est proche du Soleil, plus elle va vite : Mercure ≈ 47 km/s, Neptune ≈ 5,4 km/s.','En réalité, les orbites sont des ellipses (1ʳᵉ loi de Kepler) ; ici elles sont simplifiées en cercles.','La lumière du Soleil met plus de 4 heures pour atteindre Neptune.'],en:["One AU (astronomical unit) = 149.6 million km, the Earth–Sun distance.", "If the Sun were a basketball, Earth would be a peppercorn 26 meters away.", "The 4 inner planets are rocky; the 4 outer ones are giants of gas or ice.", "The closer a planet is to the Sun, the faster it moves: Mercury ≈ 47 km/s, Neptune ≈ 5.4 km/s.", "In reality, orbits are ellipses (Kepler’s 1st law); here they are simplified to circles.", "Sunlight takes over 4 hours to reach Neptune."]};
+let lang='fr';try{lang=localStorage.getItem('lang')||''}catch(_){}if(!lang)lang=/^en/i.test((typeof navigator!='undefined'&&navigator.language)||'')?'en':'fr';
+const SVG=`<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 7 Q 14 1 26 7 T 50 7 T 74 7 T 98 7 T 122 7 T 146 7 T 170 7 T 198 7" fill="none" stroke="#ffcf4a" stroke-width="3.5" stroke-linecap="round"/></svg>`;
+const E={
+sun:{n:"Sun",ty:"Star · yellow dwarf (G2V type)",d:"1,392,700 km (109 × Earth)",di:"—",y:"About 230 million years to orbit the Milky Way",j:"≈ 25 days at the equator",T:"5,500 °C at the surface · 15 million °C at the core",m:"—",f:"The Sun holds 99.86% of all the mass in the solar system. Its light takes 8 min 20 s to reach Earth.",e:"At the Sun’s core, nuclear fusion turns about 600 million tonnes of hydrogen into helium every second. That energy lights and warms everything around it."},
+mer:{n:"Mercury",ty:"Terrestrial planet (rocky)",d:"4,879 km",di:"57.9 M km (0.39 AU)",y:"88 days",j:"176 Earth days",T:"−180 °C at night · 430 °C by day",m:"0",f:"The smallest planet and the fastest: it speeds along at ≈ 47 km/s.",e:"With no atmosphere to hold in heat, Mercury has the biggest temperature swings in the solar system. Its surface, covered in craters, looks like the Moon’s."},
+ven:{n:"Venus",ty:"Terrestrial planet (rocky)",d:"12,104 km",di:"108.2 M km (0.72 AU)",y:"224.7 days",j:"243 Earth days (backwards spin)",T:"≈ 465 °C everywhere",m:"0",f:"On Venus the Sun rises in the west: it spins backwards. A day there lasts longer than its year!",e:"Its CO₂ atmosphere, 92 times denser than Earth’s, causes a runaway greenhouse effect. So Venus is hotter than Mercury, even though it is farther from the Sun."},
+ter:{n:"Earth",ty:"Terrestrial planet (rocky)",d:"12,742 km",di:"149.6 M km (1 AU)",y:"365.25 days",j:"23 h 56 min",T:"15 °C on average",m:"1 (the Moon)",f:"The only planet known to host life. Oceans cover about 71% of its surface.",e:"Earth’s axis is tilted by 23.4°: that is what causes the seasons. Its magnetic field and atmosphere protect us from the solar wind and radiation."},
+lun:{n:"Moon",ty:"Natural satellite of Earth",d:"3,474 km",di:"384,400 km from Earth",y:"27.3 days around Earth",j:"27.3 days (synchronous rotation)",T:"−170 °C at night · 120 °C by day",m:"—",f:"It always shows us the same face and drifts 3.8 cm farther from Earth every year.",e:"The Moon causes the tides with its gravity. It probably formed in a giant collision between Earth and another body 4.5 billion years ago."},
+mar:{n:"Mars",ty:"Terrestrial planet (rocky)",d:"6,779 km",di:"227.9 M km (1.52 AU)",y:"687 days",j:"24 h 37 min",T:"−63 °C on average",m:"2 (Phobos, Deimos)",f:"It has Olympus Mons, a 22 km-high volcano: the tallest known mountain in the solar system.",e:"The red color comes from iron oxide (rust) covering the ground. Old riverbeds show that liquid water once flowed on Mars billions of years ago."},
+jup:{n:"Jupiter",ty:"Gas giant",d:"139,820 km (11 × Earth)",di:"778.5 M km (5.2 AU)",y:"11.9 years",j:"9 h 56 min",T:"≈ −110 °C at the cloud tops",m:"95+",f:"Its Great Red Spot is a giant storm seen for more than 300 years, wider than Earth.",e:"Jupiter is mostly hydrogen and helium. Its mass is 2.5 times that of all the other planets combined. Its Galilean moons (Io, Europa, Ganymede, Callisto) were discovered by Galileo in 1610."},
+sat:{n:"Saturn",ty:"Gas giant",d:"116,460 km",di:"1,434 M km (9.5 AU)",y:"29.4 years",j:"10 h 33 min",T:"≈ −140 °C",m:"140+",f:"Saturn is less dense than water: it would float in a big enough bathtub!",e:"Its rings are made of blocks of ice and rock, 280,000 km wide but only a few tens of meters thick. Its moon Titan has a thick atmosphere and methane lakes."},
+ura:{n:"Uranus",ty:"Ice giant",d:"50,724 km",di:"2,871 M km (19.2 AU)",y:"84 years",j:"17 h 14 min",T:"≈ −195 °C",m:"28",f:"Its axis is tilted 98°: Uranus “rolls” along its orbit, with poles lit for 42 years in a row.",e:"Its cyan color comes from methane, which absorbs red light. It was the first planet discovered with a telescope, by William Herschel in 1781."},
+nep:{n:"Neptune",ty:"Ice giant",d:"49,244 km",di:"4,495 M km (30 AU)",y:"164.8 years",j:"16 h 06 min",T:"≈ −200 °C",m:"16",f:"Neptune was found by calculation (Le Verrier, 1846) before anyone saw it. Its winds exceed 2,000 km/h.",e:"Its moon Triton orbits against Neptune’s spin, a sign it was probably captured. Neptune has made only one trip around the Sun since its discovery in 1846."}};
+const tr=b=>lang=='en'?Object.assign({},b,E[b.id]):b;
+const D={fr:{title:"Système solaire 3D interactif",h1:"Le système solaire",hint:" · glisse pour tourner dans tous les sens · molette / pincement : zoom · tailles et distances non à l’échelle",orb:"Orbites",nom:"Noms",hm:"Accueil",see:"Voir la fiche",zo:"Dézoomer",zi:"Zoomer",pp:"Pause (espace)",rs:"Vue d’ensemble",kick:"Visite guidée",h2:`Fais le tour du <span class="hl">système solaire${SVG}</span>`,lead:"Ici, tout bouge pour de vrai : les planètes tournent autour du Soleil, chacune à son rythme. Tu peux les faire pivoter, t’approcher tout près et lire leur fiche.",f1:"étoile, le Soleil",f2:"planètes",f3:"Terre, notre maison",note:"Le savais-tu ? En avion, il faudrait près de 20 ans pour aller de la Terre au Soleil !",how1:"Glisse le doigt pour tourner dans tous les sens",how2:"Pince (ou molette) pour zoomer",how3:"Touche une planète pour la découvrir",go:"Commencer la visite →",back:"Tu pourras revenir ici avec le bouton « Accueil »."},
+en:{title:"Interactive 3D Solar System",h1:"The Solar System",hint:" · drag to turn in every direction · scroll / pinch to zoom · sizes and distances not to scale",orb:"Orbits",nom:"Names",hm:"Home",see:"See the fact sheet",zo:"Zoom out",zi:"Zoom in",pp:"Pause (space)",rs:"Overview",kick:"Guided tour",h2:`Take a tour of the <span class="hl">solar system${SVG}</span>`,lead:"Here, everything really moves: the planets orbit the Sun, each at its own pace. You can spin them around, get up close and read their fact sheet.",f1:"star, the Sun",f2:"planets",f3:"Earth, our home",note:"Did you know? By plane, it would take almost 20 years to fly from Earth to the Sun!",how1:"Swipe to turn in every direction",how2:"Pinch (or scroll) to zoom",how3:"Tap a planet to discover it",go:"Start the tour →",back:"You can come back here with the “Home” button."}};
+const WL={fr:{dia:"Diamètre",dis:"Distance",yr:"Année",day:"Jour",tmp:"Température",mo:"Lunes",close:"Fermer"},en:{dia:"Diameter",dis:"Distance",yr:"Year",day:"Day",tmp:"Temperature",mo:"Moons",close:"Close"}};
 const $=s=>document.querySelector(s),R=Math.random,TAU=6.2832,V=THREE.Vector3,ZERO=new V(),UP=new V(0,1,0);
 let home=true,W,H,t=0,spd=30,paused=false,sel=null,follow=null,fly=null,showO=true,showL=true,now=0;
 const app=$('#app'),rd=new THREE.WebGLRenderer({antialias:true});rd.setPixelRatio(Math.min(devicePixelRatio||1,2));app.prepend(rd.domElement);rd.domElement.style.touchAction='none';
@@ -146,7 +167,7 @@ if(home&&!ptr.size)spin(.0015,0);
 if(!ptr.size&&(vx||vy)){spin(vx,vy);vx*=.93;vy*=.93;if(Math.abs(vx)+Math.abs(vy)<1e-4)vx=vy=0}
 dist=Math.min(700,Math.max(.3,dist));cam.position.copy(tgt).add(new V(0,0,dist).applyQuaternion(q));cam.quaternion.copy(q);
 const v=new V();S.forEach(b=>{v.copy(b.g.position).project(cam);const ok=v.z<1&&showL&&(b.id!='lun'||cam.position.distanceTo(b.g.position)<20);b.l.style.display=ok?'block':'none';if(ok)b.l.style.transform=`translate(${(v.x*.5+.5)*W}px,${(-v.y*.5+.5)*H}px)`});
-$('#time').textContent='Temps simulé : '+(t/365.25).toFixed(2).replace('.',',')+' années terrestres';
+const yy=(t/365.25).toFixed(2);$('#time').textContent=lang=='en'?'Simulated time: '+yy+' Earth years':'Temps simulé : '+yy.replace('.',',')+' années terrestres';
 rd.render(sc,cam);requestAnimationFrame(frame)}
 const rc=new THREE.Raycaster(),mv=new THREE.Vector2(),dom=rd.domElement;let dn,mvd=0;
 dom.addEventListener('pointerdown',e=>{dom.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});dn={x:e.clientX,y:e.clientY};mvd=0;fly=null;vx=vy=0});
@@ -160,21 +181,30 @@ dom.addEventListener('wheel',e=>{e.preventDefault();fly=null;dist*=Math.exp(e.de
 function hl(b){S.forEach(o=>{if(o.ol){o.ol.material.color.set(o==b?0xffb84d:0x8fa0e6);o.ol.material.opacity=o==b?.8:.28}});document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',!!b&&c.dataset.id==b.id))}
 const isPhone=()=>matchMedia('(max-width:700px)').matches;
 function closeInfo(){$('#info').style.display='none';$('#seew').style.display='block'}
-function pick(b){sel=follow=b;fly={D:b.id=='sun'?34:Math.max(b.R*5,1.4)};hl(b);
-const rows=[['Diamètre',b.d],['Distance',b.di],['Année',b.y],['Jour',b.j],['Température',b.T],['Lunes',b.m]].map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('');
-const i=$('#info');i.innerHTML=`<button id="xb" aria-label="Fermer">×</button><h2>${b.n}</h2><div class="ty">${b.ty}</div><dl>${rows}</dl><p class="f">💡 ${b.f}</p><p>${b.e}</p>`;i.scrollTop=0;$('#tip').style.display='none';const ph=isPhone();i.style.display=ph?'none':'block';$('#seew').style.display=ph?'block':'none';$('#xb').onclick=()=>isPhone()?closeInfo():reset()}
+function fill(b){const d=tr(b),w=WL[lang];const rows=[[w.dia,d.d],[w.dis,d.di],[w.yr,d.y],[w.day,d.j],[w.tmp,d.T],[w.mo,d.m]].map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('');
+$('#info').innerHTML=`<button id="xb" aria-label="${w.close}">×</button><h2>${d.n}</h2><div class="ty">${d.ty}</div><dl>${rows}</dl><p class="f">💡 ${d.f}</p><p>${d.e}</p>`;$('#xb').onclick=()=>isPhone()?closeInfo():reset()}
+function pick(b){sel=follow=b;fly={D:b.id=='sun'?34:Math.max(b.R*5,1.4)};hl(b);fill(b);const i=$('#info');i.scrollTop=0;$('#tip').style.display='none';const ph=isPhone();i.style.display=ph?'none':'block';$('#seew').style.display=ph?'block':'none'}
 function reset(){sel=null;follow=S[0];fly={D:250,dir:1};hl(null);$('#info').style.display='none';$('#seew').style.display='none';$('#tip').style.display=''}
-$('#chips').innerHTML=S.map(b=>`<button class="chip" data-id="${b.id}"><i style="background:radial-gradient(circle at 35% 35%,${b.c1},${b.c2})"></i>${b.n}</button>`).join('');
+const mkChips=()=>{$('#chips').innerHTML=S.map(b=>`<button class="chip" data-id="${b.id}"><i style="background:radial-gradient(circle at 35% 35%,${b.c1},${b.c2})"></i>${tr(b).n}</button>`).join('');hl(sel)};
 $('#chips').onclick=e=>{const c=e.target.closest('.chip');if(c)pick(S.find(b=>b.id==c.dataset.id))};
 function zoomBy(f){fly=null;dist/=f}
 $('#go').onclick=()=>{home=false;$('#home').classList.add('off');reset()};$('#hm').onclick=()=>{home=true;$('#home').classList.remove('off');reset()};
 $('#see').onclick=()=>{$('#info').style.display='block';$('#seew').style.display='none'};
 $('#zi').onclick=()=>zoomBy(1.5);$('#zo').onclick=()=>zoomBy(1/1.5);$('#rs').onclick=reset;
 const pp=()=>{paused=!paused;$('#pp').textContent=paused?'▶':'⏸'};$('#pp').onclick=pp;
-function setSp(){spd=Math.pow(10,$('#rg').value/100*3.5);$('#sp').textContent=spd<365?(spd<10?spd.toFixed(1):Math.round(spd))+' jours/s':(spd/365.25).toFixed(1)+' ans/s'}
+function setSp(){spd=Math.pow(10,$('#rg').value/100*3.5);$('#sp').textContent=spd<365?(spd<10?spd.toFixed(1):Math.round(spd))+(lang=='en'?' days/s':' jours/s'):(spd/365.25).toFixed(1)+(lang=='en'?' years/s':' ans/s')}
 $('#rg').oninput=setSp;setSp();
 $('#co').onchange=e=>{showO=e.target.checked;S.forEach(b=>b.ol&&(b.ol.visible=showO))};$('#cl').onchange=e=>showL=e.target.checked;
 addEventListener('keydown',e=>{if(e.code=='Space'){e.preventDefault();pp()}else if(e.key=='+'||e.key=='=')zoomBy(1.3);else if(e.key=='-')zoomBy(1/1.3);else if(e.key=='Escape')reset()});
-let ti=0;const tip=()=>{$('#tip').textContent='💡 '+TIPS[ti++%TIPS.length]};tip();setInterval(tip,9000);
-follow=S[0];requestAnimationFrame(frame);
+let ti=0;const tip=()=>{$('#tip').textContent='💡 '+TIPS[lang][ti++%TIPS[lang].length]};tip();setInterval(tip,9000);
+follow=S[0];function applyLang(){const d=D[lang];document.documentElement.lang=lang;document.title=d.title;
+document.querySelectorAll('[data-k]').forEach(e=>e.innerHTML=d[e.dataset.k]);
+[['zo',d.zo],['zi',d.zi],['pp',d.pp],['rs',d.rs],['hm',d.hm]].forEach(([id,v])=>{const e=$('#'+id);e.title=v;e.setAttribute('aria-label',v)});
+$('#hm').textContent=d.hm;$('#see').textContent=d.see;$('#co').parentNode.lastChild.textContent=d.orb;$('#cl').parentNode.lastChild.textContent=d.nom;
+S.forEach(b=>b.l.textContent=tr(b).n);mkChips();
+if(sel){const open=$('#info').style.display=='block';fill(sel);$('#info').style.display=open?'block':'none'}
+setSp();document.querySelectorAll('#lg button').forEach(e=>e.classList.toggle('on',e.dataset.l==lang));tip()}
+$('#lg').onclick=e=>{const l=e.target.dataset.l;if(l&&l!=lang){lang=l;try{localStorage.setItem('lang',l)}catch(_){}applyLang()}};
+applyLang();
+requestAnimationFrame(frame);
 </script></body></html>
