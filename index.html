@@ -28,6 +28,9 @@ h1{font:500 19px/1.2 Fredoka,"Trebuchet MS",system-ui,sans-serif;margin:0}
 #info dt{color:var(--mut)}#info dd{margin:0}
 #info p{margin:8px 0 0;font-size:13.5px}
 #info .f{background:rgba(255,184,77,.1);border-left:3px solid var(--ac);padding:6px 10px;border-radius:0 8px 8px 0}
+#seew{left:0;right:0;bottom:76px;display:none;text-align:center;pointer-events:none}
+#see{pointer-events:auto;font:700 17px Fredoka,"Trebuchet MS",system-ui,sans-serif;color:#1a1200;background:#ffcf4a;border:0;border-radius:14px;padding:11px 24px;box-shadow:0 4px 0 #b8861a,0 6px 18px rgba(0,0,0,.5)}
+#see:active{transform:translateY(3px);box-shadow:0 1px 0 #b8861a}
 #xb{position:absolute;top:8px;right:10px;background:none;border:0;color:var(--mut);font-size:24px;cursor:pointer;line-height:1}
 #tip{bottom:70px;left:8px;right:8px;text-align:center;color:var(--mut);font-size:13px;pointer-events:none}
 #bar{bottom:8px;left:8px;right:8px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
@@ -69,6 +72,7 @@ button{cursor:pointer}#bar button{min-width:38px;font-size:16px}
 <div id="chips"></div></div>
 <div class="ui" id="info"></div>
 <div class="ui" id="tip"></div>
+<div class="ui" id="seew"><button id="see">Voir la fiche</button></div>
 <div class="ui" id="bar">
 <button id="zo" title="Dézoomer" aria-label="Dézoomer">−</button><button id="zi" title="Zoomer" aria-label="Zoomer">+</button>
 <button id="pp" title="Pause (espace)" aria-label="Pause">⏸</button>
@@ -121,7 +125,7 @@ else{for(let i=0;i<140;i++)e(R()<.5?c1:'#000',.12,3+R()*14,3+R()*14);if(id=='mar
 g.globalAlpha=1;return new THREE.CanvasTexture(c)}
 sc.add(new THREE.AmbientLight(0x404858,.9));sc.add(new THREE.PointLight(0xffffff,1.7,0,0));
 S.forEach(b=>{b.R=b.r*.2;b.A=b.a*.2;const g=b.g=new THREE.Group(),mat=b.id=='sun'?new THREE.MeshBasicMaterial({map:tex('sun',b.c1,b.c2)}):new THREE.MeshStandardMaterial({map:tex(K[b.id]||'rock',b.c1,b.c2,b.id),roughness:1});
-const m=b.m=new THREE.Mesh(new THREE.SphereGeometry(b.R,48,32),mat);g.add(m);g.rotation.z=T3[b.id]||0;sc.add(g);
+const m=b.ms=new THREE.Mesh(new THREE.SphereGeometry(b.R,48,32),mat);g.add(m);g.rotation.z=T3[b.id]||0;sc.add(g);
 if(b.id=='ter'||b.id=='ven')g.add(new THREE.Mesh(new THREE.SphereGeometry(b.R*1.07,32,24),new THREE.MeshBasicMaterial({color:b.id=='ter'?0x6fb7ff:0xf3d9a0,transparent:true,opacity:.2,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})));
 if(b.id=='sat'){const ri=b.R*1.4,ro=b.R*2.4,rg=new THREE.RingGeometry(ri,ro,96),p=rg.attributes.position,uv=rg.attributes.uv,v=new V();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);uv.setXY(i,(v.length()-ri)/(ro-ri),.5)}
 const rc=document.createElement('canvas');rc.width=256;rc.height=2;const q=rc.getContext('2d');for(let i=0;i<256;i++){q.fillStyle=`rgba(225,205,160,${(i>150&&i<165)?.04:.25+.55*Math.abs(Math.sin(i*.31)*Math.sin(i*.07+1))})`;q.fillRect(i,0,1,2)}
@@ -134,7 +138,7 @@ const pts=(a,o)=>{const gm=new THREE.BufferGeometry();gm.setAttribute('position'
 {const a=[];for(let i=0;i<3500;i++){const u=R()*2-1,th=R()*TAU,s=Math.sqrt(1-u*u);a.push(900*s*Math.cos(th),900*u,900*s*Math.sin(th))}pts(a,{color:0xffffff,size:1.6,sizeAttenuation:false,transparent:true,opacity:.85})}
 const belt=(()=>{const a=[];for(let i=0;i<3000;i++){const th=R()*TAU,r=38+R()*9;a.push(r*Math.cos(th),(R()+R()+R()-1.5)*.8,r*Math.sin(th))}return pts(a,{color:0xc3b9aa,size:.3})})();
 function frame(ts){const dt=Math.min(.05,(ts-(now||ts))/1000);now=ts;if(!paused)t+=dt*spd;
-S.forEach(b=>{if(b.a){const q=b.par?b.par.g.position:ZERO,th=b.ph+TAU*t/b.p;b.g.position.set(q.x+b.A*Math.cos(th),0,q.z+b.A*Math.sin(th));if(b.par)b.ol.position.copy(q)}if(!paused)b.m.rotation.y+=dt*(ROT[b.id]||.3)});
+S.forEach(b=>{if(b.a){const q=b.par?b.par.g.position:ZERO,th=b.ph+TAU*t/b.p;b.g.position.set(q.x+b.A*Math.cos(th),0,q.z+b.A*Math.sin(th));if(b.par)b.ol.position.copy(q)}if(!paused)b.ms.rotation.y+=dt*(ROT[b.id]||.3)});
 belt.rotation.y=-t*.0039;
 if(follow){const d=follow.g.position.clone().sub(tgt);d.multiplyScalar(d.length()<.03*dist+.01?1:.15);tgt.add(d)}
 if(fly){dist*=Math.pow(fly.D/dist,.08);if(fly.dir)q.slerp(Q0,.06);if(Math.abs(dist/fly.D-1)<.01&&(!fly.dir||q.angleTo(Q0)<.02))fly=null}
@@ -150,18 +154,21 @@ dom.addEventListener('pointermove',e=>{const p=ptr.get(e.pointerId);if(!p)return
 if(ptr.size==1){vx=-dx*.006;vy=-dy*.006;spin(vx,vy)}
 else if(ptr.size==2){const o=[...ptr].find(([k])=>k!=e.pointerId)[1],d0=Math.hypot(p.x-o.x,p.y-o.y),d1=Math.hypot(e.clientX-o.x,e.clientY-o.y);mvd+=9;if(d1>0)dist*=d0/d1}
 p.x=e.clientX;p.y=e.clientY});
-dom.addEventListener('pointerup',e=>{const one=ptr.size==1;ptr.delete(e.pointerId);if(!one||mvd>6)return;const r=dom.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);rc.setFromCamera(mv,cam);const h=rc.intersectObjects(S.map(b=>b.m))[0];if(h)pick(S.find(b=>b.m==h.object))});
+dom.addEventListener('pointerup',e=>{const one=ptr.size==1;ptr.delete(e.pointerId);if(!one||mvd>6)return;const r=dom.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);rc.setFromCamera(mv,cam);const h=rc.intersectObjects(S.map(b=>b.ms))[0];if(h)pick(S.find(b=>b.ms==h.object))});
 dom.addEventListener('pointercancel',e=>ptr.delete(e.pointerId));
 dom.addEventListener('wheel',e=>{e.preventDefault();fly=null;dist*=Math.exp(e.deltaY*.0012)},{passive:false});
 function hl(b){S.forEach(o=>{if(o.ol){o.ol.material.color.set(o==b?0xffb84d:0x8fa0e6);o.ol.material.opacity=o==b?.8:.28}});document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',!!b&&c.dataset.id==b.id))}
+const isPhone=()=>matchMedia('(max-width:700px)').matches;
+function closeInfo(){$('#info').style.display='none';$('#seew').style.display='block'}
 function pick(b){sel=follow=b;fly={D:b.id=='sun'?34:Math.max(b.R*5,1.4)};hl(b);
 const rows=[['Diamètre',b.d],['Distance',b.di],['Année',b.y],['Jour',b.j],['Température',b.T],['Lunes',b.m]].map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('');
-const i=$('#info');i.innerHTML=`<button id="xb" aria-label="Fermer">×</button><h2>${b.n}</h2><div class="ty">${b.ty}</div><dl>${rows}</dl><p class="f">💡 ${b.f}</p><p>${b.e}</p>`;i.style.display='block';i.scrollTop=0;$('#xb').onclick=reset;$('#tip').style.display='none'}
-function reset(){sel=null;follow=S[0];fly={D:250,dir:1};hl(null);$('#info').style.display='none';$('#tip').style.display=''}
+const i=$('#info');i.innerHTML=`<button id="xb" aria-label="Fermer">×</button><h2>${b.n}</h2><div class="ty">${b.ty}</div><dl>${rows}</dl><p class="f">💡 ${b.f}</p><p>${b.e}</p>`;i.scrollTop=0;$('#tip').style.display='none';const ph=isPhone();i.style.display=ph?'none':'block';$('#seew').style.display=ph?'block':'none';$('#xb').onclick=()=>isPhone()?closeInfo():reset()}
+function reset(){sel=null;follow=S[0];fly={D:250,dir:1};hl(null);$('#info').style.display='none';$('#seew').style.display='none';$('#tip').style.display=''}
 $('#chips').innerHTML=S.map(b=>`<button class="chip" data-id="${b.id}"><i style="background:radial-gradient(circle at 35% 35%,${b.c1},${b.c2})"></i>${b.n}</button>`).join('');
 $('#chips').onclick=e=>{const c=e.target.closest('.chip');if(c)pick(S.find(b=>b.id==c.dataset.id))};
 function zoomBy(f){fly=null;dist/=f}
 $('#go').onclick=()=>{home=false;$('#home').classList.add('off');reset()};$('#hm').onclick=()=>{home=true;$('#home').classList.remove('off');reset()};
+$('#see').onclick=()=>{$('#info').style.display='block';$('#seew').style.display='none'};
 $('#zi').onclick=()=>zoomBy(1.5);$('#zo').onclick=()=>zoomBy(1/1.5);$('#rs').onclick=reset;
 const pp=()=>{paused=!paused;$('#pp').textContent=paused?'▶':'⏸'};$('#pp').onclick=pp;
 function setSp(){spd=Math.pow(10,$('#rg').value/100*3.5);$('#sp').textContent=spd<365?(spd<10?spd.toFixed(1):Math.round(spd))+' jours/s':(spd/365.25).toFixed(1)+' ans/s'}
