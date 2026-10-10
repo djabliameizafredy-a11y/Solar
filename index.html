@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Système solaire 3D interactif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@500;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#02030a;--fg:#e8ecf8;--mut:#93a0c2;--pan:rgba(12,17,36,.9);--bd:rgba(150,170,255,.2);--ac:#ffb84d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 Nunito,"Segoe UI",system-ui,sans-serif;overflow:hidden}
+#app{position:relative;width:100%;height:100%;overflow:hidden}
+canvas{position:absolute;inset:0;cursor:grab}canvas:active{cursor:grabbing}
+.ui{position:absolute;pointer-events:none}.ui>*{pointer-events:auto}
+#labels{inset:0;overflow:hidden}
+.lb{position:absolute;left:0;top:0;margin:-9px 0 0 9px;font-size:12px;color:rgba(232,236,248,.92);text-shadow:0 0 4px #000,0 0 4px #000;cursor:pointer;white-space:nowrap;padding:2px 4px}
+#top{top:8px;left:8px;right:8px}
+h1{font:500 19px/1.2 Fredoka,"Trebuchet MS",system-ui,sans-serif;margin:0}
+#sub{color:var(--mut);font-size:12px;margin:2px 0 6px}
+#chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:none;background:var(--pan);color:var(--fg);border:1px solid var(--bd);border-radius:20px;padding:4px 11px 4px 8px;font:inherit;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.chip i{width:10px;height:10px;border-radius:50%;display:block}
+.chip.on{border-color:var(--ac);color:var(--ac)}
+#info{top:112px;right:8px;width:330px;max-height:calc(100% - 205px);overflow:auto;background:var(--pan);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;backdrop-filter:blur(8px);display:none}
+#info h2{margin:0;font-size:22px}
+#info .ty{color:var(--ac);font-size:12.5px;margin-bottom:8px}
+#info dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:8px 0;font-size:13px}
+#info dt{color:var(--mut)}#info dd{margin:0}
+#info p{margin:8px 0 0;font-size:13.5px}
+#info .f{background:rgba(255,184,77,.1);border-left:3px solid var(--ac);padding:6px 10px;border-radius:0 8px 8px 0}
+#xb{position:absolute;top:8px;right:10px;background:none;border:0;color:var(--mut);font-size:24px;cursor:pointer;line-height:1}
+#tip{bottom:70px;left:8px;right:8px;text-align:center;color:var(--mut);font-size:13px;pointer-events:none}
+#bar{bottom:8px;left:8px;right:8px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+#bar>*{background:var(--pan);border:1px solid var(--bd);border-radius:10px;color:var(--fg);font:inherit;padding:6px 11px}
+button{cursor:pointer}#bar button{min-width:38px;font-size:16px}
+#bar label{display:flex;align-items:center;gap:6px;font-size:13px}
+#bar input[type=range]{width:130px;accent-color:var(--ac)}
+#sp{min-width:76px;font-size:12px;color:var(--mut)}
+#home{position:absolute;inset:0;z-index:10;display:flex;align-items:center;padding:clamp(20px,6vw,84px);background:linear-gradient(90deg,rgba(2,3,10,.95) 0%,rgba(2,3,10,.84) 40%,rgba(2,3,10,.04) 78%);overflow:auto;transition:opacity .5s}
+#home.off{opacity:0;pointer-events:none}
+.hi{max-width:540px;margin:auto 0}
+.kick{display:flex;align-items:center;gap:10px;color:#ffcf4a;font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.kick:before{content:"";width:28px;height:2px;background:#ffcf4a}
+.hi h2{font:700 clamp(36px,5.6vw,64px)/1.04 Fredoka,"Trebuchet MS",system-ui,sans-serif;margin:0 0 18px;color:#fff}
+.hl{position:relative;white-space:nowrap;color:#ffcf4a}
+.hl svg{position:absolute;left:0;bottom:-.14em;width:100%;height:.28em}
+.hi p{margin:0;font-size:17px;line-height:1.6;color:#c3cbe3;max-width:46ch}
+.facts{display:flex;gap:26px;margin:26px 0 22px}
+.facts div{border-left:2px solid rgba(255,255,255,.2);padding-left:12px}
+.facts b{display:block;font:700 40px/1 Fredoka,"Trebuchet MS",system-ui,sans-serif;color:#fff}
+.facts span{font-size:13px;color:var(--mut)}
+.note{display:inline-block;background:#ffe58a;color:#3b2f00;font:600 21px/1.2 Caveat,"Segoe Print","Bradley Hand",cursive;padding:10px 16px;transform:rotate(-1.8deg);box-shadow:3px 4px 0 rgba(0,0,0,.4);max-width:330px;margin-bottom:26px}
+.how{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:8px;counter-reset:n;font-size:15px;color:#dfe5f7}
+.how li{counter-increment:n;display:flex;align-items:center;gap:10px}
+.how li:before{content:counter(n);flex:none;width:24px;height:24px;border-radius:50%;border:2px solid #ffcf4a;color:#ffcf4a;font-weight:700;font-size:13px;display:grid;place-items:center}
+#go{font:700 19px Fredoka,"Trebuchet MS",system-ui,sans-serif;color:#1a1200;background:#ffcf4a;border:0;border-radius:14px;padding:14px 26px;cursor:pointer;box-shadow:0 5px 0 #b8861a;transition:transform .1s,box-shadow .1s}
+#go:hover{transform:translateY(-2px);box-shadow:0 7px 0 #b8861a}
+#go:active{transform:translateY(4px);box-shadow:0 1px 0 #b8861a}
+.back{display:block;margin-top:12px;font-size:12.5px;color:var(--mut)}
+@media(max-width:760px){#home{background:linear-gradient(180deg,rgba(2,3,10,.96),rgba(2,3,10,.88) 65%,rgba(2,3,10,.55));align-items:flex-start}.facts{gap:16px}.facts b{font-size:32px}}
+@media(max-height:660px){.note,.how{display:none}.facts{margin:18px 0}}
+@media(max-width:700px),(max-height:560px){.hint{display:none}#bar{gap:6px}#bar>*{padding:5px 8px}#bar input[type=range]{width:90px}}
+@media(max-height:560px){#tip{display:none}}
+@media(max-width:700px){#info{top:auto;bottom:112px;left:8px;right:8px;width:auto;max-height:38%}#tip{bottom:auto;top:92px}}
+</style></head><body><div id="app">
+<div class="ui" id="labels"></div>
+<div class="ui" id="top"><h1>Le système solaire</h1>
+<div id="sub"><span id="time"></span><span class="hint"> · glisse pour tourner dans tous les sens · molette / pincement : zoom · tailles et distances non à l’échelle</span></div>
+<div id="chips"></div></div>
+<div class="ui" id="info"></div>
+<div class="ui" id="tip"></div>
+<div class="ui" id="bar">
+<button id="zo" title="Dézoomer" aria-label="Dézoomer">−</button><button id="zi" title="Zoomer" aria-label="Zoomer">+</button>
+<button id="pp" title="Pause (espace)" aria-label="Pause">⏸</button>
+<input type="range" id="rg" min="0" max="100" value="42" aria-label="Vitesse"><span id="sp"></span>
+<label><input type="checkbox" id="co" checked>Orbites</label><label><input type="checkbox" id="cl" checked>Noms</label>
+<button id="rs" title="Vue d’ensemble" aria-label="Vue d’ensemble">⌂</button><button id="hm" title="Accueil" aria-label="Accueil">Accueil</button></div>
+<div id="home"><div class="hi">
+<div class="kick">Visite guidée</div>
+<h2>Fais le tour du <span class="hl">système solaire<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 7 Q 14 1 26 7 T 50 7 T 74 7 T 98 7 T 122 7 T 146 7 T 170 7 T 198 7" fill="none" stroke="#ffcf4a" stroke-width="3.5" stroke-linecap="round"/></svg></span></h2>
+<p>Ici, tout bouge pour de vrai : les planètes tournent autour du Soleil, chacune à son rythme. Tu peux les faire pivoter, t’approcher tout près et lire leur fiche.</p>
+<div class="facts"><div><b>1</b><span>étoile, le Soleil</span></div><div><b>8</b><span>planètes</span></div><div><b>1</b><span>Terre, notre maison</span></div></div>
+<div class="note">Le savais-tu ? En avion, il faudrait près de 20 ans pour aller de la Terre au Soleil !</div>
+<ol class="how"><li>Glisse le doigt pour tourner dans tous les sens</li><li>Pince (ou molette) pour zoomer</li><li>Touche une planète pour la découvrir</li></ol>
+<button id="go">Commencer la visite →</button>
+<span class="back">Tu pourras revenir ici avec le bouton « Accueil ».</span>
+</div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+if(!window.THREE){document.body.insertAdjacentHTML("beforeend","<p style=\"position:absolute;top:120px;left:16px;right:16px\">La 3D n’a pas pu se charger (cdnjs bloqué ?). Réessaie ou ouvre le lien dans un nouvel onglet.</p>");throw 0}
+const S=[
+{id:'sun',n:'Soleil',ty:'Étoile · naine jaune (type G2V)',c1:'#fff3b0',c2:'#ff9d00',r:30,a:0,p:0,d:'1 392 700 km (109 × la Terre)',di:'—',y:'≈ 230 millions d’années pour un tour de la Voie lactée',j:'≈ 25 jours à l’équateur',T:'5 500 °C en surface · 15 millions °C au cœur',m:'—',f:'Le Soleil renferme 99,86 % de toute la masse du système solaire. Sa lumière met 8 min 20 s pour atteindre la Terre.',e:'Au cœur du Soleil, la fusion nucléaire transforme environ 600 millions de tonnes d’hydrogène en hélium chaque seconde. Cette énergie éclaire et chauffe tous les astres qui l’entourent.'},
+{id:'mer',n:'Mercure',ty:'Planète tellurique (rocheuse)',c1:'#cfc9c0',c2:'#7a736a',r:3,a:60,p:88,d:'4 879 km',di:'57,9 M km (0,39 UA)',y:'88 jours',j:'176 jours terrestres',T:'−180 °C la nuit · 430 °C le jour',m:'0',f:'C’est la plus petite planète et la plus rapide : elle file à ≈ 47 km/s.',e:'Sans atmosphère pour retenir la chaleur, Mercure subit les plus grands écarts de température du système. Sa surface criblée de cratères ressemble à celle de la Lune.'},
+{id:'ven',n:'Vénus',ty:'Planète tellurique (rocheuse)',c1:'#f6e1ac',c2:'#b98a3e',r:5,a:90,p:224.7,d:'12 104 km',di:'108,2 M km (0,72 UA)',y:'224,7 jours',j:'243 jours terrestres (sens rétrograde)',T:'≈ 465 °C partout',m:'0',f:'Sur Vénus, le Soleil se lève à l’ouest : elle tourne à l’envers. Un jour y dure plus longtemps que son année !',e:'Son atmosphère de CO₂, 92 fois plus dense que celle de la Terre, provoque un effet de serre extrême. Vénus est donc plus chaude que Mercure, pourtant plus proche du Soleil.'},
+{id:'ter',n:'Terre',ty:'Planète tellurique (rocheuse)',c1:'#7fc1ff',c2:'#1d5aa8',r:5.5,a:125,p:365.25,d:'12 742 km',di:'149,6 M km (1 UA)',y:'365,25 jours',j:'23 h 56 min',T:'15 °C en moyenne',m:'1 (la Lune)',f:'Seule planète connue abritant la vie. Les océans couvrent environ 71 % de sa surface.',e:'L’axe de la Terre est incliné de 23,4° : c’est la cause des saisons. Son champ magnétique et son atmosphère nous protègent du vent solaire et des rayonnements.'},
+{id:'lun',n:'Lune',ty:'Satellite naturel de la Terre',c1:'#ececec',c2:'#8a8a8a',r:1.6,a:13,p:27.3,par:'ter',d:'3 474 km',di:'384 400 km de la Terre',y:'27,3 jours autour de la Terre',j:'27,3 jours (rotation synchrone)',T:'−170 °C la nuit · 120 °C le jour',m:'—',f:'Elle nous montre toujours la même face et s’éloigne de la Terre de 3,8 cm par an.',e:'La Lune provoque les marées par son attraction gravitationnelle. Elle s’est probablement formée lors d’une collision géante entre la Terre et un autre corps, il y a 4,5 milliards d’années.'},
+{id:'mar',n:'Mars',ty:'Planète tellurique (rocheuse)',c1:'#ff9a6c',c2:'#9c3d1a',r:4,a:160,p:687,d:'6 779 km',di:'227,9 M km (1,52 UA)',y:'687 jours',j:'24 h 37 min',T:'−63 °C en moyenne',m:'2 (Phobos, Déimos)',f:'Elle abrite Olympus Mons, un volcan de 22 km de haut : la plus haute montagne connue du système solaire.',e:'La couleur rouge vient de l’oxyde de fer (la rouille) qui recouvre le sol. D’anciens lits de rivières montrent que de l’eau liquide a coulé sur Mars il y a des milliards d’années.'},
+{id:'jup',n:'Jupiter',ty:'Géante gazeuse',c1:'#f0d3aa',c2:'#a2723a',r:13,a:290,p:4333,d:'139 820 km (11 × la Terre)',di:'778,5 M km (5,2 UA)',y:'11,9 ans',j:'9 h 56 min',T:'≈ −110 °C au sommet des nuages',m:'Plus de 95',f:'Sa Grande Tache rouge est une tempête géante observée depuis plus de 300 ans, plus large que la Terre.',e:'Jupiter est composée surtout d’hydrogène et d’hélium. Sa masse vaut 2,5 fois celle de toutes les autres planètes réunies. Ses lunes galiléennes (Io, Europe, Ganymède, Callisto) furent découvertes par Galilée en 1610.'},
+{id:'sat',n:'Saturne',ty:'Géante gazeuse',c1:'#f6e6b6',c2:'#be9a52',r:11,a:370,p:10759,d:'116 460 km',di:'1 434 M km (9,5 UA)',y:'29,4 ans',j:'10 h 33 min',T:'≈ −140 °C',m:'Plus de 140',f:'Saturne est moins dense que l’eau : elle flotterait dans une baignoire assez grande !',e:'Ses anneaux sont faits de blocs de glace et de roche, larges de 280 000 km mais épais de quelques dizaines de mètres seulement. Sa lune Titan possède une atmosphère épaisse et des lacs de méthane.'},
+{id:'ura',n:'Uranus',ty:'Géante de glaces',c1:'#c8f6f8',c2:'#4fa9b6',r:8,a:440,p:30687,d:'50 724 km',di:'2 871 M km (19,2 UA)',y:'84 ans',j:'17 h 14 min',T:'≈ −195 °C',m:'28',f:'Son axe est incliné de 98° : Uranus « roule » sur son orbite, avec des pôles éclairés pendant 42 ans de suite.',e:'Sa couleur cyan vient du méthane qui absorbe la lumière rouge. Elle fut la première planète découverte au télescope, par William Herschel en 1781.'},
+{id:'nep',n:'Neptune',ty:'Géante de glaces',c1:'#8aa9ff',c2:'#2641b8',r:8,a:505,p:60190,d:'49 244 km',di:'4 495 M km (30 UA)',y:'164,8 ans',j:'16 h 06 min',T:'≈ −200 °C',m:'16',f:'Neptune a été découverte par le calcul (Le Verrier, 1846) avant d’être observée. Ses vents dépassent 2 000 km/h.',e:'Sa lune Triton tourne en sens inverse de la rotation de Neptune, signe qu’elle a sans doute été capturée. Neptune n’a accompli qu’un seul tour du Soleil depuis sa découverte en 1846.'}];
+const PH=[0,1.2,2.5,4.0,0,.7,5.1,3.3,5.8,1.9],T3={ter:.41,mar:.44,jup:.05,sat:.47,ura:1.71,nep:.49,ven:3.09},ROT={sun:.05,mer:.05,ven:-.08,ter:.6,mar:.55,jup:1.3,sat:1.1,ura:-.8,nep:.9,lun:.1},K={sun:'sun',ter:'earth',ven:'gas',jup:'gas',sat:'gas',ura:'gas',nep:'gas'};
+S.forEach((b,i)=>b.ph=PH[i]);S.forEach(b=>{if(b.par)b.par=S.find(o=>o.id==b.par)});
+const TIPS=['1 UA (unité astronomique) = 149,6 millions de km, la distance Terre–Soleil.','Si le Soleil était un ballon de basket, la Terre serait un grain de poivre à 26 mètres.','Les 4 planètes proches sont rocheuses ; les 4 lointaines sont des géantes de gaz ou de glaces.','Plus une planète est proche du Soleil, plus elle va vite : Mercure ≈ 47 km/s, Neptune ≈ 5,4 km/s.','En réalité, les orbites sont des ellipses (1ʳᵉ loi de Kepler) ; ici elles sont simplifiées en cercles.','La lumière du Soleil met plus de 4 heures pour atteindre Neptune.'];
+const $=s=>document.querySelector(s),R=Math.random,TAU=6.2832,V=THREE.Vector3,ZERO=new V(),UP=new V(0,1,0);
+let home=true,W,H,t=0,spd=30,paused=false,sel=null,follow=null,fly=null,showO=true,showL=true,now=0;
+const app=$('#app'),rd=new THREE.WebGLRenderer({antialias:true});rd.setPixelRatio(Math.min(devicePixelRatio||1,2));app.prepend(rd.domElement);rd.domElement.style.touchAction='none';
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.05,3000),tgt=new V(),_a=new THREE.Quaternion(),AX=new V(1,0,0);
+const pose=(x,y,z)=>{const c=new THREE.Camera();c.position.set(x,y,z);c.lookAt(0,0,0);return c.quaternion.clone()};
+const q=pose(0,.5,.87),Q0=q.clone();let dist=250,vx=0,vy=0;const ptr=new Map();
+const spin=(ax,ay)=>q.multiply(_a.setFromAxisAngle(UP,ax)).multiply(_a.setFromAxisAngle(AX,ay)).normalize();
+function size(){W=app.clientWidth||innerWidth;H=app.clientHeight||innerHeight;rd.setSize(W,H);cam.aspect=W/H;cam.updateProjectionMatrix()}
+addEventListener('resize',size);size();
+function tex(k,c1,c2,id){const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d'),e=(f,a,w,h)=>{g.fillStyle=f;g.globalAlpha=a;g.beginPath();g.ellipse(R()*512,R()*256,w,h,R()*3,0,TAU);g.fill()};
+g.fillStyle=c2;g.fillRect(0,0,512,256);
+if(k=='gas'){for(let i=0;i<45;i++){g.fillStyle=R()<.5?c1:c2;g.globalAlpha=.2+R()*.4;g.fillRect(0,R()*256,512,3+R()*16)}if(id=='jup'){g.globalAlpha=.9;g.fillStyle='#b5532f';g.beginPath();g.ellipse(360,160,28,13,0,0,TAU);g.fill()}}
+else if(k=='sun'){for(let i=0;i<260;i++)e(R()<.5?c1:'#ff6a00',.25,8+R()*26,5+R()*14)}
+else if(k=='earth'){g.fillStyle='#1d5aa8';g.fillRect(0,0,512,256);for(let i=0;i<55;i++)e(R()<.7?'#3f8f48':'#a8975a',.95,10+R()*34,6+R()*18);for(let i=0;i<50;i++)e('#fff',.22,14+R()*30,3+R()*5);g.globalAlpha=1;g.fillStyle='#eef4ff';g.fillRect(0,0,512,12);g.fillRect(0,244,512,12)}
+else{for(let i=0;i<140;i++)e(R()<.5?c1:'#000',.12,3+R()*14,3+R()*14);if(id=='mar'){g.globalAlpha=.9;g.fillStyle='#fff';g.fillRect(0,0,512,8);g.fillRect(0,248,512,8)}}
+g.globalAlpha=1;return new THREE.CanvasTexture(c)}
+sc.add(new THREE.AmbientLight(0x404858,.9));sc.add(new THREE.PointLight(0xffffff,1.7,0,0));
+S.forEach(b=>{b.R=b.r*.2;b.A=b.a*.2;const g=b.g=new THREE.Group(),mat=b.id=='sun'?new THREE.MeshBasicMaterial({map:tex('sun',b.c1,b.c2)}):new THREE.MeshStandardMaterial({map:tex(K[b.id]||'rock',b.c1,b.c2,b.id),roughness:1});
+const m=b.m=new THREE.Mesh(new THREE.SphereGeometry(b.R,48,32),mat);g.add(m);g.rotation.z=T3[b.id]||0;sc.add(g);
+if(b.id=='ter'||b.id=='ven')g.add(new THREE.Mesh(new THREE.SphereGeometry(b.R*1.07,32,24),new THREE.MeshBasicMaterial({color:b.id=='ter'?0x6fb7ff:0xf3d9a0,transparent:true,opacity:.2,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})));
+if(b.id=='sat'){const ri=b.R*1.4,ro=b.R*2.4,rg=new THREE.RingGeometry(ri,ro,96),p=rg.attributes.position,uv=rg.attributes.uv,v=new V();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);uv.setXY(i,(v.length()-ri)/(ro-ri),.5)}
+const rc=document.createElement('canvas');rc.width=256;rc.height=2;const q=rc.getContext('2d');for(let i=0;i<256;i++){q.fillStyle=`rgba(225,205,160,${(i>150&&i<165)?.04:.25+.55*Math.abs(Math.sin(i*.31)*Math.sin(i*.07+1))})`;q.fillRect(i,0,1,2)}
+const ring=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(rc),transparent:true,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=Math.PI/2;g.add(ring)}
+if(b.a){const pts=[];for(let i=0;i<=128;i++)pts.push(new V(Math.cos(i/128*TAU)*b.A,0,Math.sin(i/128*TAU)*b.A));b.ol=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x8fa0e6,transparent:true,opacity:.28}));sc.add(b.ol)}
+b.l=document.createElement('div');b.l.className='lb';b.l.textContent=b.n;b.l.onclick=()=>pick(b);$('#labels').append(b.l)});
+{const gc=document.createElement('canvas');gc.width=gc.height=128;const gg=gc.getContext('2d'),gr=gg.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(255,220,120,.9)');gr.addColorStop(.25,'rgba(255,170,40,.35)');gr.addColorStop(1,'rgba(255,120,0,0)');gg.fillStyle=gr;gg.fillRect(0,0,128,128);
+const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));gl.scale.set(34,34,1);sc.add(gl)}
+const pts=(a,o)=>{const gm=new THREE.BufferGeometry();gm.setAttribute('position',new THREE.Float32BufferAttribute(a,3));const p=new THREE.Points(gm,new THREE.PointsMaterial(o));sc.add(p);return p};
+{const a=[];for(let i=0;i<3500;i++){const u=R()*2-1,th=R()*TAU,s=Math.sqrt(1-u*u);a.push(900*s*Math.cos(th),900*u,900*s*Math.sin(th))}pts(a,{color:0xffffff,size:1.6,sizeAttenuation:false,transparent:true,opacity:.85})}
+const belt=(()=>{const a=[];for(let i=0;i<3000;i++){const th=R()*TAU,r=38+R()*9;a.push(r*Math.cos(th),(R()+R()+R()-1.5)*.8,r*Math.sin(th))}return pts(a,{color:0xc3b9aa,size:.3})})();
+function frame(ts){const dt=Math.min(.05,(ts-(now||ts))/1000);now=ts;if(!paused)t+=dt*spd;
+S.forEach(b=>{if(b.a){const q=b.par?b.par.g.position:ZERO,th=b.ph+TAU*t/b.p;b.g.position.set(q.x+b.A*Math.cos(th),0,q.z+b.A*Math.sin(th));if(b.par)b.ol.position.copy(q)}if(!paused)b.m.rotation.y+=dt*(ROT[b.id]||.3)});
+belt.rotation.y=-t*.0039;
+if(follow){const d=follow.g.position.clone().sub(tgt);d.multiplyScalar(d.length()<.03*dist+.01?1:.15);tgt.add(d)}
+if(fly){dist*=Math.pow(fly.D/dist,.08);if(fly.dir)q.slerp(Q0,.06);if(Math.abs(dist/fly.D-1)<.01&&(!fly.dir||q.angleTo(Q0)<.02))fly=null}
+if(home&&!ptr.size)spin(.0015,0);
+if(!ptr.size&&(vx||vy)){spin(vx,vy);vx*=.93;vy*=.93;if(Math.abs(vx)+Math.abs(vy)<1e-4)vx=vy=0}
+dist=Math.min(700,Math.max(.3,dist));cam.position.copy(tgt).add(new V(0,0,dist).applyQuaternion(q));cam.quaternion.copy(q);
+const v=new V();S.forEach(b=>{v.copy(b.g.position).project(cam);const ok=v.z<1&&showL&&(b.id!='lun'||cam.position.distanceTo(b.g.position)<20);b.l.style.display=ok?'block':'none';if(ok)b.l.style.transform=`translate(${(v.x*.5+.5)*W}px,${(-v.y*.5+.5)*H}px)`});
+$('#time').textContent='Temps simulé : '+(t/365.25).toFixed(2).replace('.',',')+' années terrestres';
+rd.render(sc,cam);requestAnimationFrame(frame)}
+const rc=new THREE.Raycaster(),mv=new THREE.Vector2(),dom=rd.domElement;let dn,mvd=0;
+dom.addEventListener('pointerdown',e=>{dom.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});dn={x:e.clientX,y:e.clientY};mvd=0;fly=null;vx=vy=0});
+dom.addEventListener('pointermove',e=>{const p=ptr.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;mvd+=Math.abs(dx)+Math.abs(dy);
+if(ptr.size==1){vx=-dx*.006;vy=-dy*.006;spin(vx,vy)}
+else if(ptr.size==2){const o=[...ptr].find(([k])=>k!=e.pointerId)[1],d0=Math.hypot(p.x-o.x,p.y-o.y),d1=Math.hypot(e.clientX-o.x,e.clientY-o.y);mvd+=9;if(d1>0)dist*=d0/d1}
+p.x=e.clientX;p.y=e.clientY});
+dom.addEventListener('pointerup',e=>{const one=ptr.size==1;ptr.delete(e.pointerId);if(!one||mvd>6)return;const r=dom.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);rc.setFromCamera(mv,cam);const h=rc.intersectObjects(S.map(b=>b.m))[0];if(h)pick(S.find(b=>b.m==h.object))});
+dom.addEventListener('pointercancel',e=>ptr.delete(e.pointerId));
+dom.addEventListener('wheel',e=>{e.preventDefault();fly=null;dist*=Math.exp(e.deltaY*.0012)},{passive:false});
+function hl(b){S.forEach(o=>{if(o.ol){o.ol.material.color.set(o==b?0xffb84d:0x8fa0e6);o.ol.material.opacity=o==b?.8:.28}});document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',!!b&&c.dataset.id==b.id))}
+function pick(b){sel=follow=b;fly={D:b.id=='sun'?34:Math.max(b.R*5,1.4)};hl(b);
+const rows=[['Diamètre',b.d],['Distance',b.di],['Année',b.y],['Jour',b.j],['Température',b.T],['Lunes',b.m]].map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('');
+const i=$('#info');i.innerHTML=`<button id="xb" aria-label="Fermer">×</button><h2>${b.n}</h2><div class="ty">${b.ty}</div><dl>${rows}</dl><p class="f">💡 ${b.f}</p><p>${b.e}</p>`;i.style.display='block';i.scrollTop=0;$('#xb').onclick=reset;$('#tip').style.display='none'}
+function reset(){sel=null;follow=S[0];fly={D:250,dir:1};hl(null);$('#info').style.display='none';$('#tip').style.display=''}
+$('#chips').innerHTML=S.map(b=>`<button class="chip" data-id="${b.id}"><i style="background:radial-gradient(circle at 35% 35%,${b.c1},${b.c2})"></i>${b.n}</button>`).join('');
+$('#chips').onclick=e=>{const c=e.target.closest('.chip');if(c)pick(S.find(b=>b.id==c.dataset.id))};
+function zoomBy(f){fly=null;dist/=f}
+$('#go').onclick=()=>{home=false;$('#home').classList.add('off');reset()};$('#hm').onclick=()=>{home=true;$('#home').classList.remove('off');reset()};
+$('#zi').onclick=()=>zoomBy(1.5);$('#zo').onclick=()=>zoomBy(1/1.5);$('#rs').onclick=reset;
+const pp=()=>{paused=!paused;$('#pp').textContent=paused?'▶':'⏸'};$('#pp').onclick=pp;
+function setSp(){spd=Math.pow(10,$('#rg').value/100*3.5);$('#sp').textContent=spd<365?(spd<10?spd.toFixed(1):Math.round(spd))+' jours/s':(spd/365.25).toFixed(1)+' ans/s'}
+$('#rg').oninput=setSp;setSp();
+$('#co').onchange=e=>{showO=e.target.checked;S.forEach(b=>b.ol&&(b.ol.visible=showO))};$('#cl').onchange=e=>showL=e.target.checked;
+addEventListener('keydown',e=>{if(e.code=='Space'){e.preventDefault();pp()}else if(e.key=='+'||e.key=='=')zoomBy(1.3);else if(e.key=='-')zoomBy(1/1.3);else if(e.key=='Escape')reset()});
+let ti=0;const tip=()=>{$('#tip').textContent='💡 '+TIPS[ti++%TIPS.length]};tip();setInterval(tip,9000);
+follow=S[0];requestAnimationFrame(frame);
+</script></body></html>
